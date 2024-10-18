@@ -1,0 +1,52 @@
+<!-- templates/zabbix/zabbix.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zabbix Problems</title>
+</head>
+<body>
+    <h1>Zabbix Problems</h1>
+    <div id="problems"></div>
+
+    <script>
+        console.log("iiii");
+
+        const problemsDiv = document.getElementById("problems");
+
+        // Establish WebSocket connection
+        const socket = new WebSocket('ws://localhost:8000/ws/zabbix/problems/');
+
+        // Handle WebSocket events
+        socket.onopen = function(event) {
+            console.log("WebSocket connection established.");
+        };
+
+        socket.onmessage = function(event) {
+            console.log("Data received from WebSocket:");
+            const data = JSON.parse(event.data);
+            console.log("Data received from WebSocket:", data);
+
+            // Clear previous problems
+            problemsDiv.innerHTML = '';
+
+            // Iterate through received problems and display them
+            data.forEach(problem => {
+                const problemElement = document.createElement('div');
+                problemElement.textContent = `Problem ID: ${problem.problemid}, Status: ${problem.status}, Name: ${problem.name}`;
+                problemsDiv.appendChild(problemElement);
+            });
+        };
+
+        socket.onclose = function(event) {
+            console.log("WebSocket connection closed:", event);
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket error:", error);
+        };
+    </script>
+</body>
+</html>
